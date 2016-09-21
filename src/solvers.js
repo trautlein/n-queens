@@ -13,10 +13,71 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
+var Tree = function (grid) {
+  this.grid = grid;
+  this.children = [];
+};
+
+
+var newGridRow = function(oldGrid, currentColumn, currentRow) {
+  var oldGrid = oldGrid || [];
+};
+
+
+Tree.prototype.addChild = function(newGridRow) {
+  var child = new Tree(newGridRow(this.grid));
+  this.children.push(child);
+  return child;
+};
+
+
+var newGrid = function(n) {
+  var grid = [];
+  for (var i = 0; i < n; i++) {
+    var row = [];
+    for (var j = 0; j < n; j++) {
+      row.push(0);
+    }
+    grid.push(row);
+  }
+  return grid;
+};
 
 
 window.findNRooksSolution = function(n) {
   var solution = undefined; //fixme
+
+  // create the basic board that is empty
+  var emptyGrid = newGrid(n);
+  // loop over each row of the grid (n times) 
+
+  var recurse = function (counter, row, node) {
+    if (counter === n) {
+      node.addChild(emptyGrid);
+    } else {
+      var newChild = node.addChild(emptyGrid);
+      return recurse(counter + 1, row, newChild);
+    }
+
+  };
+
+  var rootTree = new Tree(emptyGrid);
+
+  for (var i = 0; i < n; i++) {
+    recurse(0, i, rootTree);
+  }
+    // create a new tree and add it as a child of it's base tree
+
+      // add a base grid to the tree
+
+        // populate the grid with a rook in each column
+
+        // call recursive function on each child that we created
+
+        //
+
+
+  console.log(rootTree);
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -26,7 +87,7 @@ window.findNRooksSolution = function(n) {
 window.countNRooksSolutions = function(n) {
   var solutionCount = undefined; //fixme
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
@@ -34,7 +95,7 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   var solution = undefined; //fixme
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
@@ -42,6 +103,6 @@ window.findNQueensSolution = function(n) {
 window.countNQueensSolutions = function(n) {
   var solutionCount = undefined; //fixme
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
