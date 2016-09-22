@@ -19,13 +19,17 @@ var Tree = function (grid) {
 };
 
 
-var newGridRow = function(oldGrid, currentColumn, currentRow) {
+Tree.prototype.newGridRow = function(oldGrid, currentColumn, currentRow) {
   var oldGrid = oldGrid || [];
 };
 
 
 Tree.prototype.addChild = function(newGridRow) {
-  var child = new Tree(newGridRow(this.grid));
+
+  var child = new Tree(this.newGridRow());
+
+  // 
+
   this.children.push(child);
   return child;
 };
@@ -45,20 +49,21 @@ var newGrid = function(n) {
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  // var solution = undefined; //fixme
 
   // create the basic board that is empty
   var emptyGrid = newGrid(n);
+
   // loop over each row of the grid (n times) 
 
   var recurse = function (counter, row, node) {
-    if (counter === n) {
-      node.addChild(emptyGrid);
-    } else {
+    if (counter < n) {
       var newChild = node.addChild(emptyGrid);
-      return recurse(counter + 1, row, newChild);
+      for (var i = 0; i < n; i++) { 
+        // var revisedGrid = 
+        recurse(counter + 1, row, newChild);
+      }
     }
-
   };
 
   var rootTree = new Tree(emptyGrid);
@@ -77,7 +82,8 @@ window.findNRooksSolution = function(n) {
         //
 
 
-  console.log(rootTree);
+  // console.log(rootTree);
+  var solution = rootTree.grid;
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
