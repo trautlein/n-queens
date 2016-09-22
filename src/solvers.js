@@ -26,9 +26,7 @@ Tree.prototype.newGridRow = function(oldGrid, currentColumn, currentRow) {
 
 Tree.prototype.addChild = function(newGridRow) {
 
-  var child = new Tree(this.newGridRow());
-
-  // 
+  var child = new Tree(newGridRow);
 
   this.children.push(child);
   return child;
@@ -49,40 +47,32 @@ var newGrid = function(n) {
 
 
 window.findNRooksSolution = function(n) {
-  // var solution = undefined; //fixme
-
-  // create the basic board that is empty
   var emptyGrid = newGrid(n);
 
-  // loop over each row of the grid (n times) 
-
-  var recurse = function (counter, row, node) {
-    if (counter < n) {
-      var newChild = node.addChild(emptyGrid);
-      for (var i = 0; i < n; i++) { 
-        // var revisedGrid = 
-        recurse(counter + 1, row, newChild);
+  var recurse = function (row, node) {
+    if (row < n) {
+      for (var col = 0; col < n; col++) {
+        var newGrid = copyArray(node.grid);
+        var newChild = node.addChild(newGrid);
+        newChild.grid[row][col] = 1;
+        recurse(row + 1, newChild);
       }
     }
   };
 
+  var copyArray = function(array) {
+    var result = [];
+    for (var i = 0; i < array.length; i++) {
+      result.push(array[i].slice(0));
+    }
+    return result;
+  };
+
   var rootTree = new Tree(emptyGrid);
 
-  for (var i = 0; i < n; i++) {
-    recurse(0, i, rootTree);
-  }
-    // create a new tree and add it as a child of it's base tree
+  
+  recurse(0, rootTree);
 
-      // add a base grid to the tree
-
-        // populate the grid with a rook in each column
-
-        // call recursive function on each child that we created
-
-        //
-
-
-  // console.log(rootTree);
   var solution = rootTree.grid;
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
