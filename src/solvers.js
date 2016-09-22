@@ -13,6 +13,60 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
+// helper functions
+
+var hasRowConflictAt = function(grid, rowIndex) {
+  var row = grid[rowIndex];
+  var foundOne = false;
+  for (var i = 0; i < row.length; i++) {
+    if (!!row[i]) {
+      if (foundOne) {
+        return true;
+      }
+      foundOne = true;
+    }
+  }
+  return false;
+};
+
+// test if any rows on this board contain conflicts
+var hasAnyRowConflicts = function(grid) {
+  for (var i = 0; i < grid.length; i++) {
+    if (hasRowConflictAt(grid, i)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+var hasColConflictAt = function(grid, colIndex) {
+  var rows = grid;
+  var foundOne = false;
+  for (var i = 0; i < rows.length; i++) {
+    var column = rows[i][colIndex];
+    if (!!column) {
+      if (foundOne) {
+        return true;
+      }
+      foundOne = true;
+    }
+  }
+  return false;
+};
+
+    // test if any columns on this board contain conflicts
+var hasAnyColConflicts = function(grid) {
+  var rows = grid;
+  for (var i = 0; i < rows.length; i++) {
+    if (this.hasColConflictAt(grid, i)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+// Tree Class and methods
 var Tree = function (grid) {
   this.grid = grid;
   this.children = [];
@@ -32,6 +86,30 @@ Tree.prototype.addChild = function(newGridRow) {
   return child;
 };
 
+Tree.prototype.findLeaves = function(node){
+  node = node || this;
+  if (node.children.length === 0) {
+    return 1;
+  } else {
+    var leafsHere = 0;
+    for ( var i = 0; i < node.children.length; i++ ) {
+      leafsHere += node.findLeaves(node.children[i]);
+    }
+    return leafsHere;
+  }
+};
+
+Tree.prototype.findLeaf = function() {
+  // debugger;
+  if (this.children.length === 0) {
+    return this.grid;
+  } else {
+    for ( var i = 0; i < this.children.length; i++ ) {
+      return this.children[i].findLeaf();
+    }
+  }
+};
+
 
 var newGrid = function(n) {
   var grid = [];
@@ -46,16 +124,19 @@ var newGrid = function(n) {
 };
 
 
-window.findNRooksSolution = function(n) {
+window.populateTree = function(n) {
   var emptyGrid = newGrid(n);
 
   var recurse = function (row, node) {
     if (row < n) {
       for (var col = 0; col < n; col++) {
         var newGrid = copyArray(node.grid);
-        var newChild = node.addChild(newGrid);
-        newChild.grid[row][col] = 1;
-        recurse(row + 1, newChild);
+        newGrid[row][col] = 1;
+
+        if (!hasAnyColConflicts(newGrid) && !hasAnyRowConflicts(newGrid)) {
+          var newChild = node.addChild(newGrid);
+          recurse(row + 1, newChild);
+        }
       }
     }
   };
@@ -73,17 +154,24 @@ window.findNRooksSolution = function(n) {
   
   recurse(0, rootTree);
 
-  var solution = rootTree.grid;
+  return rootTree;
+};
 
+
+window.findNRooksSolution = function(n) {
+  var rootTree = window.populateTree(n);
+
+  var solution = rootTree.findLeaf();
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var rootTree = window.populateTree(n);
 
-  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  var solutionCount = rootTree.findLeaves();
+  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
