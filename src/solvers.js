@@ -18,7 +18,8 @@
 var hasRowConflictAt = function(grid, rowIndex) {
   var row = grid[rowIndex];
   var foundOne = false;
-  for (var i = 0; i < row.length; i++) {
+  var len = row.length;
+  for (var i = 0; i < len; i++) {
     if (!!row[i]) {
       if (foundOne) {
         return true;
@@ -31,7 +32,8 @@ var hasRowConflictAt = function(grid, rowIndex) {
 
 // test if any rows on this board contain conflicts
 var hasAnyRowConflicts = function(grid) {
-  for (var i = 0; i < grid.length; i++) {
+  var len = grid.length;
+  for (var i = 0; i < len; i++) {
     if (hasRowConflictAt(grid, i)) {
       return true;
     }
@@ -41,8 +43,9 @@ var hasAnyRowConflicts = function(grid) {
 
 var hasColConflictAt = function(grid, colIndex) {
   var rows = grid;
+  var len = rows.length;
   var foundOne = false;
-  for (var i = 0; i < rows.length; i++) {
+  for (var i = 0; i < len; i++) {
     var column = rows[i][colIndex];
     if (!!column) {
       if (foundOne) {
@@ -57,7 +60,8 @@ var hasColConflictAt = function(grid, colIndex) {
     // test if any columns on this board contain conflicts
 var hasAnyColConflicts = function(grid) {
   var rows = grid;
-  for (var i = 0; i < rows.length; i++) {
+  var len = rows.length;
+  for (var i = 0; i < len; i++) {
     if (this.hasColConflictAt(grid, i)) {
       return true;
     }
@@ -66,37 +70,32 @@ var hasAnyColConflicts = function(grid) {
   return false;
 };
 
+// SOLUTION START
 
+var hasMajorDiagonalConflictAt = function(grid, majorDiagonalColumnIndexAtFirstRow) {
 
-// Hans Added Start
-var hasMajorDiagonalConflictAt = function(grid, diagonalColumnIndex) {
-  var rows = grid;
-  var originalStartRow = 0;
-
-  while (diagonalColumnIndex < 0) {
-    diagonalColumnIndex++;
-    originalStartRow++;
-  }
-
+  var size = grid.length;
   var count = 0;
-  var currentRow = originalStartRow;
-  for ( var i = diagonalColumnIndex; i + originalStartRow < grid.length; i++, currentRow++ ) {
-    if (grid[currentRow][i] === 1) {
-      count++;
+  var rowIdx = 0;
+  var colIdx = majorDiagonalColumnIndexAtFirstRow;
+
+  for ( ; rowIdx < size && colIdx < size; rowIdx++, colIdx++ ) {
+    if ( colIdx >= 0 ) {
+      var row = grid[rowIdx];
+      count += row[colIdx];
     }
   }
 
-  if (count > 1) {
-    return true;
-  }
-
-  return false;
+  return count > 1;
 };
 
 // test if any major diagonals on this board contain conflicts
 var hasAnyMajorDiagonalConflicts = function(grid) {
-  for (var i = (grid.length * -1) + 2; i + 1 < grid.length; i++) {
-    if (this.hasMajorDiagonalConflictAt(grid, i)) {
+
+  var size = grid.length;
+
+  for ( var i = 1 - size; i < size; i++ ) {
+    if ( hasMajorDiagonalConflictAt(grid, i) ) {
       return true;
     }
   }
@@ -104,43 +103,39 @@ var hasAnyMajorDiagonalConflicts = function(grid) {
   return false;
 };
 
-var hasMinorDiagonalConflictAt = function(grid, diagonalColumnIndex) {
-  // console.log(JSON.stringify(this.rows()));
-  var rows = grid;
-  var originalStartRow = 0;
+var hasMinorDiagonalConflictAt = function(grid, minorDiagonalColumnIndexAtFirstRow) {
 
-  while (diagonalColumnIndex > rows.length) {
-    diagonalColumnIndex--;
-    originalStartRow++;
-  }
-
+  var size = grid.length;
   var count = 0;
-  var currentRow = originalStartRow;
-  for ( var i = diagonalColumnIndex; currentRow < rows.length; i--, currentRow++ ) {
-    if (rows[currentRow][i] === 1) {
-      count++;
+  var rowIdx = 0;
+  var colIdx = minorDiagonalColumnIndexAtFirstRow;
+
+  for ( ; rowIdx < size && colIdx >= 0; rowIdx++, colIdx-- ) {
+    if ( colIdx < size ) {
+      var row = grid[rowIdx];
+      count += row[colIdx];
     }
   }
 
-  if (count > 1) {
-    return true;
-  }
-
-  return false;
+  return count > 1;
 };
 
 // test if any minor diagonals on this board contain conflicts
 var hasAnyMinorDiagonalConflicts = function(grid) {
-  for (var i = (grid.length) + 2; i > 0; i--) {
-    if (this.hasMinorDiagonalConflictAt(grid, i)) {
+
+  var size = grid.length;
+
+  for ( var i = (size * 2) - 1; i >= 0; i-- ) {
+    if ( this.hasMinorDiagonalConflictAt(grid, i) ) {
       return true;
     }
   }
+
   return false;
 };
 
 
-// Hans Added End
+// SOLUTION END
 
 
 // Tree Class and methods
@@ -169,7 +164,8 @@ Tree.prototype.findLeaves = function(node) {
     return 1;
   } else {
     var leafsHere = 0;
-    for ( var i = 0; i < node.children.length; i++ ) {
+    var len = node.children.length;
+    for ( var i = 0; i < len; i++ ) {
       leafsHere += node.findLeaves(node.children[i]);
     }
     return leafsHere;
@@ -180,54 +176,52 @@ Tree.prototype.findLeaf = function() {
   if (this.children.length === 0) {
     return this.grid;
   } else {
-    for ( var i = 0; i < this.children.length; i++ ) {
+    var len = node.children.length;
+    for ( var i = 0; i < len; i++ ) {
       return this.children[i].findLeaf();
     }
   }
 };
 
-Tree.prototype.findLeavesQueen = function(node) {
-  node = node || this;
-  if (node.children.length === 0 && this.checkNPieces(this.grid)) {
-    return 1;
-  } else {
-    var leafsHere = 0;
-    for ( var i = 0; i < node.children.length; i++ ) {
-      leafsHere += node.findLeavesQueen(node.children[i]);
-    }
-    return leafsHere;
-  }
-};
-
-Tree.prototype.findLeafQueen = function() {
-  if (this.children.length === 0 && this.checkNPieces(this.grid)) {
-    // debugger;
-    return this.grid;
-  } else {
-    for ( var i = 0; i < this.children.length; i++ ) {
-      return this.children[i].findLeafQueen();
-    }
-  }
-};
-
-Tree.prototype.checkNPieces = function(grid) {
-  var len = grid.length;
+Tree.prototype.findLeavesQueen = function(node, currentLevel, desiredLevel) {
   var counter = 0;
-  // debugger;  
+  var grids = [];
 
-  for (var i = 0; i < len; i++) {
-    for (var j = 0; j < len; j++) {
-      counter += grid[i][j];
+  var drill = function(node, currentLevel, desiredLevel) {
+    if (currentLevel === desiredLevel) {
+      counter++;
+      grids.push(node.grid);
+    } else {
+      var len = node.children.length;
+      for ( var i = 0; i < len; i++ ) {
+        drill(node.children[i], currentLevel + 1, desiredLevel);
+      }
     }
-  }
+  };
 
-  if (counter === len) {
-    return true;
-  }
-  return false;
+  drill(node, currentLevel, desiredLevel);
+  return grids.length;
 };
 
 
+Tree.prototype.findLeafQueen = function(node, currentLevel, desiredLevel) {
+  var result = node.grid;
+
+  var drill = function(node, currentLevel, desiredLevel) {
+    if (currentLevel === desiredLevel) {
+      result = node.grid;
+    } else {
+      var len = node.children.length;
+      for ( var i = 0; i < len; i++ ) {
+        drill(node.children[i], currentLevel + 1, desiredLevel);
+      }
+    }
+  };
+
+  drill(node, currentLevel, desiredLevel);
+  return result;
+
+};
 
 var newGrid = function(n) {
   var grid = [];
@@ -297,7 +291,8 @@ window.populateTreeQueens = function(n) {
 
   var copyArray = function(array) {
     var result = [];
-    for (var i = 0; i < array.length; i++) {
+    var len = array.length;
+    for (var i = 0; i < len; i++) {
       result.push(array[i].slice(0));
     }
     return result;
@@ -307,7 +302,6 @@ window.populateTreeQueens = function(n) {
 
   
   recurse(0, rootTree);
-  debugger;
 
   return rootTree;
 };
@@ -317,7 +311,7 @@ window.findNRooksSolution = function(n) {
   var rootTree = window.populateTreeRooks(n);
 
   var solution = rootTree.findLeaf();
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
@@ -326,7 +320,7 @@ window.countNRooksSolutions = function(n) {
   var rootTree = window.populateTreeRooks(n);
 
   var solutionCount = rootTree.findLeaves();
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
 
@@ -334,8 +328,8 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   var rootTree = window.populateTreeQueens(n);
 
-  var solution = rootTree.findLeafQueen();
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  var solution = rootTree.findLeafQueen(rootTree, 0, n);
+  // console.log('Single solution for ' + n + ' queens:', solution);
   return solution;
 };
 
@@ -343,8 +337,7 @@ window.findNQueensSolution = function(n) {
 window.countNQueensSolutions = function(n) {
   var rootTree = window.populateTreeQueens(n);
 
-  var solutionCount = rootTree.findLeavesQueen();
-
+  var solutionCount = rootTree.findLeavesQueen(rootTree, 0, n);
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
